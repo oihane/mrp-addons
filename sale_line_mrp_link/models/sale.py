@@ -33,6 +33,7 @@ class SaleOrderLine(models.Model):
         for line in self:
             line.mrp_production_id = production_obj.with_context(
                 active_test=False).search([
+                    ("product_id", "=", line.product_id.id),
                     ("sale_line_id", "=", line.id),
                     ("state", "!=", "cancel"),
                 ], limit=1)
@@ -104,7 +105,7 @@ class SaleOrder(models.Model):
                 action_dict.get('context', '{}'))
         action_dict['context'].update({
             'active_test': False,
-            'default_sale_line_id': self.id,
+            'default_sale_order_id': self.id,
         })
         domain = expression.AND([
             [("sale_line_id", "in", self.order_line.ids)],
